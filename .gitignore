@@ -3,6 +3,4 @@
 .project
 .settings/
 config/autoload/local.php
-data/uploads/
-data/tpw_crm.sql
-data/TPWExport.xls
+data/
