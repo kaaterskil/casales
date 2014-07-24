@@ -1,0 +1,107 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: distributionActivityIndex.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Model\AbstractInteraction
+
+/* @var $oda AbstractInteraction */
+/* @var $cda AbstractInteraction */
+?>
+<h2>Open Activities</h2>
+<div class="tabbed-table-container">
+	<table>
+		<thead class="fixed-thead">
+			<tr>
+				<th width="300" class="first">Subject</th>
+				<th width="170">Sender</th>
+				<th width="170">Recipient</th>
+				<th width="180">Regarding</th>
+				<th width="93">Direction</th>
+			</tr>
+		</thead>
+		<tbody class="scrollable-tbody">
+			<?php if(count($this->openActivities)) : ?>
+				<?php foreach ($this->openActivities as $oda) : ?>
+				<?php
+				$href = $this->url( 'activity', array(
+					'action' => 'edit',
+					'id' => $oda->getId(),
+					'type' => $oda->getDiscriminator(),
+					'entityId' => $this->entityId,
+					'entityRoute' => $this->entityRoute
+				) );
+				$link = '<a href="' . $href . '">' . $oda->getSubject() . '</a>';
+				?>
+			<tr>
+				<td width="300" class="first"><?php echo $link; ?></td>
+				<td width="170"><?php echo $oda->getFrom(); ?></td>
+				<td width="170"><?php echo $oda->getTo(); ?></td>
+				<td width="180"><?php echo $oda->getRegardingObjectName(true); ?></td>
+				<td width="77"><?php echo $oda->getDirection(); ?></td>
+			</tr>
+				<?php endforeach; ?>
+			<?php else : ?>
+			<tr>
+				<td colspan="5" class="tabbed-no-records">No records found.</td>
+			</tr>
+			<?php endif; ?>
+		</tbody>
+	</table>
+</div>
+<h2>Closed Activities</h2>
+<div class="tabbed-table-container">
+	<table>
+		<thead class="fixed-thead">
+			<tr>
+				<th width="260" class="first">Subject</th>
+				<th width="190">Sender</th>
+				<th width="190">Recipient</th>
+				<th width="180">Regarding</th>
+				<th width="93">Direction</th>
+			</tr>
+		</thead>
+		<tbody class="scrollable-tbody">
+			<?php if(count($this->closedActivities)) : ?>
+				<?php foreach ($this->closedActivities as $cda) : ?>
+				<?php
+				$href = $this->url( 'activity', array(
+					'action' => 'edit',
+					'id' => $cda->getId(),
+					'type' => $cda->getDiscriminator(),
+					'entityId' => $this->entityId,
+					'entityRoute' => $this->entityRoute
+				) );
+				$link = '<a href="' . $href . '">' . $cda->getSubject() . '</a>';
+				?>
+			<tr>
+				<td width="260" class="first"><?php echo $link; ?></td>
+				<td width="190"><?php echo $cda->getFrom(); ?></td>
+				<td width="190"><?php echo $cda->getTo(); ?></td>
+				<td width="180"><?php echo $cda->getRegardingObjectName(true); ?></td>
+				<td width="77"><?php echo $cda->getDirection(); ?></td>
+			</tr>
+				<?php endforeach; ?>
+			<?php else : ?>
+			<tr>
+				<td colspan="5" class="tabbed-no-records">No records found.</td>
+			</tr>
+			<?php endif; ?>
+		</tbody>
+	</table>
+</div>

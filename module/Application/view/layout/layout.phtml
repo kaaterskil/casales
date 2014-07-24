@@ -1,0 +1,73 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: layout.phtml 13 2013-08-05 22:53:55Z  $
+ */
+?>
+<?php echo $this->doctype(); ?>
+
+
+<!--[if IE 7]>
+<html class="ie ie7" lang="en">
+<![endif]-->
+<!--[if IE 8]>
+<html class="ie ie8" lang="en">
+<![endif]-->
+<!--[if !(IE 7) | !(IE 8)  ]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+<meta charset="utf-8">
+	<?php echo $this->headTitle()->setSeparator(' - ')->setAutoEscape(false); ?>
+
+	<?php echo $this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1.0'); ?>
+
+	<!-- Styles -->
+	<?php
+	
+	echo $this->headLink()
+		->prependStylesheet( $this->basePath( '/css/960.css' ) )
+		->prependStylesheet( $this->basePath( '/css/style.css' ) );
+	?>
+
+	<!-- Scripts -->
+	<?php
+	
+	echo $this->headScript()->prependFile( $this->basePath() . '/js/html5.js', 'text/javascript', array(
+		'conditional' => 'lt IE 9'
+	) );
+	echo $this->headScript()
+		->prependFile( $this->basePath() . '/js/bootstrap.min.js' )
+		->prependFile( $this->basePath() . '/js/jquery-1.10.1.js' )
+		->appendFile( $this->basePath() . '/js/tinymce/tinymce.jquery.js' )
+		->appendFile( $this->basePath() . '/js/casales.js' );
+	?>
+	</head>
+<body>
+	<div class="container_12">
+		<div class="grid_12">
+		<?php if($this->zfcUserIdentity()) : ?>
+			<?php echo $this->navigation( 'navigation' )->menu()->renderMenu( null, array('ulClass' => 'main-navigation') ); ?>
+		<?php endif; ?>
+		</div>
+	</div>
+	<div id="content" class="container_12">
+		<?php echo $this->content; ?>
+	</div>
+</body>
+</html>

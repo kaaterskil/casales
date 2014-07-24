@@ -1,0 +1,49 @@
+<?php
+
+use Zend\Form\Form;
+
+/* @var $form Form */
+
+$this->headTitle( 'Casales' );
+
+$form = $this->loginForm;
+$form->setAttributes( array(
+	'action' => $this->url( 'zfcuser/login' ),
+	'method' => 'post'
+) );
+$form->prepare();
+
+// Remove existing submit button (it needs to be an input element)
+$form->remove( 'submit' );
+
+// Create new submit button
+$form->add(array(
+	'type' => 'Submit',
+	'name' => 'submitButton',
+	'attributes' => array(
+		'class' => 'button mtm',
+		'value' => 'Log In',
+		'title' => 'Log In'
+	)
+) );
+
+$messages = $form->getMessages();
+?>
+<h1>Casales Login</h1>
+
+<?php echo $this->form()->openTag($form); ?>
+<dl class="zend_form">
+	<?php echo $this->formElementErrors($form->get('identity'))?>
+
+    <dt><?php echo $this->formLabel($form->get('identity')) ?></dt>
+	<dd><?php echo $this->formInput($form->get('identity')) ?></dd>
+
+	<dt><?php echo $this->formLabel($form->get('credential')) ?></dt>
+	<dd><?php echo $this->formInput($form->get('credential')) ?></dd>
+
+	<?php if ($this->redirect): ?>
+		<input type="hidden" name="redirect" value="<?php echo $this->escapeHtml($this->redirect) ?>" />
+	<?php endif ?>
+    <dd><?php echo $this->formRow($form->get('submitButton')) ?></dd>
+</dl>
+<?php echo $this->form()->closeTag(); ?>

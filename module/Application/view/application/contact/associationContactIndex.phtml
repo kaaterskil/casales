@@ -1,0 +1,63 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: associationContactIndex.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Model\Contact;
+use Application\Model\AddressDTO;
+
+/* @var $cp Contact */
+/* @var $cpad AddressDTO */
+?>
+<h2>Contacts</h2>
+<div class="tabbed-table-container-6">
+	<table>
+		<thead class="fixed-thead">
+			<tr>
+				<th width="217" class="first">Name</th>
+				<th width="220">Email</th>
+				<th width="100">Telephone</th>
+				<th width="220">Address</th>
+				<th width="100">City</th>
+				<th width="53">State</th>
+			</tr>
+		</thead>
+		<tbody class="scrollable-tbody">
+			<?php if(count($this->contacts)) : ?>
+			<?php foreach ($this->contacts as $cp) : ?>
+				<?php
+			$cpad = $cp->getPrimaryAddress();
+			$cpLink = $this->url('contact', array('action' => 'edit', 'id' => $cp->getId()));
+			?>
+			<tr>
+				<td width="217" class="first"><a href="<?php echo $cpLink; ?>" target="_blank"><?php echo $cp->getDisplayName(); ?></a></td>
+				<td width="220"><?php echo $cp->getEmailLink(); ?></td>
+				<td width="100"><?php echo $cp->getPrimaryTelephone(); ?></td>
+				<td width="220"><?php echo $cpad->getStreet(); ?></td>
+				<td width="100"><?php echo $cpad->getCity(); ?></td>
+				<td width="37"><?php echo $cpad->getRegion(); ?></td>
+			</tr>
+				<?php endforeach; ?>
+				<?php else : ?>
+			<tr>
+				<td colspan="6" width="913">No records found.</td>
+			</tr>
+			<?php endif; ?>
+		</tbody>
+	</table>
+</div>

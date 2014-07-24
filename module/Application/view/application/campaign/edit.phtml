@@ -1,0 +1,175 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: edit.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Form\CampaignForm;
+use Application\Form\CampaignFieldset;
+
+/* @var $form CampaignForm */
+/* @var $cfs CampaignFieldset */
+
+// Set page title
+$this->headTitle()->append($this->pageTitle);
+$this->headTitle()->append('Casales');
+
+$form = $this->form;
+$form->setAttributes(array(
+	'action' => $this->url('campaign', array('action' => 'edit', 'id' => $this->id)),
+	'method' => 'post',
+	'name' => 'campaign-edit',
+));
+$form->prepare();
+
+// Other variables
+$cfs = $form->get(CampaignFieldset::FIELDSETNAME);
+$activityIndexParams = array(
+	'openActivities' => $this->openActivities,
+	'closedActivities' => $this->closedActivities,
+	'type' => 'CampaignActivity',
+	'entityId' => $this->id,
+	'entityRoute' => 'campaign',
+);
+$campaignActivityIndexParams = array(
+	'openCampaignActivities' => $this->openCampaignActivities,
+	'closedCampaignActivities' => $this->closedCampaignActivities,
+	'type' => 'CampaignActivity',
+	'entityId' => $this->id,
+	'entityRoute' => 'campaign',
+);
+$campaignResponseIndexParams = array(
+	'campaignResponses' => $this->campaignResponses,
+	'type' => 'CampaignResponse',
+	'entityId' => $this->id,
+	'entityRoute' => 'campaign',
+);
+$marketingLisParams = array(
+	'id' => $this->id,
+	'marketingLists' => $this->marketingLists,
+);
+$listQueryParams = array(
+	'id' => $this->id,
+	'queryForm' => $this->queryForm,
+	'recordSet' => $this->recordSet,
+);
+$auditIndexParams = array(
+	'auditItems' => $this->auditItems
+);
+?>
+<div class="grid_12">
+	<div class="entity-type">Campaign</div>
+	<h1 class="page-title">
+		<?php echo $this->pageTitle; ?>
+	</h1>
+
+	<ul class="tabs">
+		<li><a href="#" id="tab-1" title="tab-content-1" class="tab<?php echo ($this->front == 'tab-1' ? ' front' : ''); ?>">General</a></li>
+		<li><a href="#" id="tab-2" title="tab-content-2" class="tab<?php echo ($this->front == 'tab-2' ? ' front' : ''); ?>">Campaign Activities</a></li>
+		<li><a href="#" id="tab-6" title="tab-content-6" class="tab<?php echo ($this->front == 'tab-6' ? ' front' : ''); ?>">Campaign Responses</a></li>
+		<li><a href="#" id="tab-3" title="tab-content-3" class="tab<?php echo ($this->front == 'tab-3' ? ' front' : ''); ?>">Planning Activities</a></li>
+		<li><a href="#" id="tab-4" title="tab-content-4" class="tab<?php echo ($this->front == 'tab-4' ? ' front' : ''); ?>">Marketing Lists</a></li>
+		<li><a href="#" id="tab-5" title="tab-content-5" class="tab<?php echo ($this->front == 'tab-5' ? ' front' : ''); ?>">Find Lists</a></li>
+		<li><a href="#" id="tab-7" title="tab-content-7" class="tab<?php echo ($this->front == 'tab-7' ? ' front' : ''); ?>">Audit</a></li>
+	</ul>
+	
+	<?php echo $this->form()->openTag($form); ?>
+	<div id="tab-content-1" class="tab-content">
+		<div class="button-container">
+			<a href="<?php echo $this->url('campaign', array('action' => 'create')); ?>" class="button lfloat mbs mrl">New</a>
+			<?php echo $this->formRow($form->get(CampaignForm::SUBMIT)); ?>
+			<?php echo $this->formRow($form->get(CampaignForm::SUBMITCLOSE)); ?>
+			<a id="copyButton" class="button lfloat mll"
+				href="<?php echo $this->url('campaign', array('action' => 'copy', 'id' => $this->id)); ?>">Create Copy</a>
+		</div>
+		<div class="clearfix"></div>
+		<fieldset>
+			<legend>General</legend>
+			<div class="inside-fieldset-left">
+				<?php echo $this->formRow($cfs->get(CampaignFieldset::ID)); ?>
+				<?php echo $this->formRow($cfs->get(CampaignFieldset::NAME)); ?>
+				<?php echo $this->formRow($cfs->get(CampaignFieldset::CODENAME)); ?>
+				<?php echo $this->formRow($cfs->get(CampaignFieldset::EXPECTEDRESPONSE)); ?>
+				<?php echo $this->formRow($cfs->get(CampaignFieldset::EXPECTEDREVENUE)); ?>
+			</div>
+			<div class="inside-fieldset-right">
+				<?php echo $this->formRow($cfs->get(CampaignFieldset::OWNER)); ?>
+				<?php echo $this->formRow($cfs->get(CampaignFieldset::STATUS)); ?>
+				<?php echo $this->formRow($cfs->get(CampaignFieldset::TYPE)); ?>
+			</div>
+			<div class="clearfix"></div>
+			<?php echo $this->formRow($cfs->get(CampaignFieldset::OBJECTIVE)); ?>
+		</fieldset>
+		<div class="clearfix"></div>
+		<fieldset>
+			<legend>Schedule</legend>
+			<div class="inside-fieldset-left">
+				<?php echo $this->formRow($cfs->get(CampaignFieldset::PROPOSEDSTART)); ?>
+				<?php echo $this->formRow($cfs->get(CampaignFieldset::PROPOSEDEND)); ?>
+			</div>
+			<div class="inside-fieldset-right">
+				<?php echo $this->formRow($cfs->get(CampaignFieldset::ACTUALSTART)); ?>
+				<?php echo $this->formRow($cfs->get(CampaignFieldset::ACTUALEND)); ?>
+			</div>
+		</fieldset>
+		<fieldset>
+			<legend>Description</legend>
+			<?php echo $this->formRow($cfs->get(CampaignFieldset::DESCRIPTION)); ?>
+		</fieldset>
+		<div class="clearfix"></div>
+	</div>
+	<?php echo $this->form()->closeTag(); ?>
+
+	<div id="tab-content-2" class="tab-content">
+		<div class="button-container">
+			<a id="newCampaignActivityButton" class="button lfloat mrl"
+				href="<?php echo $this->url('campaign', array('action' => 'addActivity', 'id' => $this->id, 'type' => 'CampaignActivity')); ?>">New Activity</a>
+		</div>
+		<div class="clearfix"></div>
+		<?php echo $this->partial('application/campaign/campaignActivityIndex.phtml', $campaignActivityIndexParams); ?>
+	</div>
+
+	<div id="tab-content-6" class="tab-content">
+		<div class="button-container">
+			<a id="newCampaignResponseButton" class="button lfloat mrl"
+				href="<?php echo $this->url('campaign', array('action' => 'addActivity', 'id' => $this->id, 'type' => 'CampaignResponse')); ?>">New Response</a>
+		</div>
+		<div class="clearfix"></div>
+		<?php echo $this->partial('application/campaign/campaignResponseIndex.phtml', $campaignResponseIndexParams); ?>
+	</div>
+		
+	<div id="tab-content-3" class="tab-content">
+	<?php echo $this->navigation( $this->navigation )->menu()->renderMenu( null, array('ulClass' => 'ribbon') ); ?>
+	<?php echo $this->partial('application/activity/associationActivityIndex.phtml', $activityIndexParams); ?>
+	</div>
+		
+	<div id="tab-content-4" class="tab-content">
+	<?php echo $this->partial('application/campaign/MarketingListIndex.phtml', $marketingLisParams); ?>
+	</div>
+
+	<div id="tab-content-5" class="tab-content">
+		<?php echo $this->partial('application/campaign/listQuery.phtml', $listQueryParams); ?>
+	</div>
+	
+	<div id="tab-content-7" class="tab-content">
+	<?php echo $this->partial('application/audit/associationAuditIndex.phtml', $auditIndexParams); ?>
+	</div>
+</div>
+<div class="clearfix"></div>
+<div class="grid_12">
+	<div class="bottom-status-bar"><?php echo $this->statusMessage; ?></div>
+</div>

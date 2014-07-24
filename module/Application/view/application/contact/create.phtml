@@ -1,0 +1,165 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: create.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Form\ContactForm;
+use Application\Form\ContactFieldset;
+use Application\Form\AddressFieldset;
+
+/* @var $form ContactForm */
+/* @var $cfs ContactFieldset */
+/* @var $address1 AddressFieldset */
+/* @var $address2 AddressFieldset */
+
+// Set page title
+$this->headTitle()->append($this->pageTitle);
+$this->headTitle()->append('Casales');
+
+$form = $this->form;
+
+// Set the form attributes
+$form->setAttributes(array(
+	'action' => $this->url('contact', array('action' => 'create', 'id' => 0)),
+	'method' => 'post',
+	'name' => 'contact-create',
+));
+$form->prepare();
+
+$cfs = $form->get(ContactFieldset::FIELDSETNAME);
+?>
+<div class="grid_12">
+	<div class="entity-type">Contact</div>
+	<h1 class="page-title">
+		<?php echo $this->pageTitle; ?>
+	</h1>
+	
+	<ul class="tabs">
+		<li><a href="#" id="tab-1" title="tab-content-1" class="tab front">General</a></li>
+		<li><a href="#" id="tab-2" title="tab-content-2" class="tab">Details</a></li>
+	</ul>
+	
+	<?php echo $this->form()->openTag($form); ?>
+	<div id="tab-content-1" class="tab-content">
+		<div class="button-container">
+			<div class="lfloat mbm">
+			<?php echo $this->formRow($form->get(ContactForm::SUBMIT)); ?>
+			</div>
+			<?php echo $this->formRow($form->get(ContactForm::SUBMITCLOSE)); ?>
+			<a id="telephoneButton" class="button lfloat mll" href="#">Add Telephone</a>
+			<a id="addressButton"class="button lfloat mll" href="#">Add Address</a>
+		</div>
+		<div class="clearfix"></div>
+		<fieldset>
+			<legend>Personal Information</legend>
+			<div class="inside-fieldset-left">
+				<?php
+				echo $this->formRow($cfs->get(ContactFieldset::SALUTATION));
+				echo $this->formRow($cfs->get(ContactFieldset::PREFIX));
+				echo $this->formRow($cfs->get(ContactFieldset::FIRSTNAME));
+				echo $this->formRow($cfs->get(ContactFieldset::MIDDLENAME));
+				echo $this->formRow($cfs->get(ContactFieldset::LASTNAME));
+				echo $this->formRow($cfs->get(ContactFieldset::SUFFIX));
+				?>
+			</div>
+			<div class="inside-fieldset-right">
+				<?php
+				echo $this->formRow($cfs->get(ContactFieldset::NICKNAME));
+				echo $this->formRow($cfs->get(ContactFieldset::GENDER));
+				echo $this->formRow($cfs->get(ContactFieldset::SORTNAME));
+				echo $this->formRow($cfs->get(ContactFieldset::JOBTITLE));
+				echo $this->formRow($cfs->get(ContactFieldset::EMAIL1));
+				echo $this->formRow($cfs->get(ContactFieldset::EMAIL2));
+				?>
+			</div>
+			<div class="clearfix"></div>
+			<?php echo $this->formRow($cfs->get(ContactFieldset::ACCOUNT)); ?>
+		</fieldset>
+		<div class="clearfix"></div>
+		<div class="inner-grid-6 alpha">
+			<div id="telephone-container">
+				<?php echo $this->formCollection($cfs->get(ContactFieldset::TELEPHONE)); ?>
+			</div>
+		</div>
+		<div class="inner-grid-6 omega">
+			<div id="address-container">
+				<?php echo $this->formCollection($cfs->get(ContactFieldset::ADDRESS)); ?>
+			</div>
+		</div>
+		<div class="clearfix"></div>
+	</div>
+	
+	<div id="tab-content-2" class="tab-content">
+		<div class="button-container">
+			<?php
+			echo $this->formRow($form->get(ContactForm::SUBMIT));
+			echo $this->formRow($form->get(ContactForm::SUBMITCLOSE));
+			?>
+		</div>
+		<div class="clearfix"></div>
+		<fieldset>
+			<legend>General</legend>
+			<div class="inside-fieldset-left">
+			<?php
+			echo $this->formRow($cfs->get(ContactFieldset::ISPRIMARY));
+			echo $this->formRow($cfs->get(ContactFieldset::ORIGINATINGLEAD));
+			?>
+			</div>
+			<div class="inside-fieldset-right">
+			<?php
+			echo $this->formRow($cfs->get(ContactFieldset::STATUS));
+			echo $this->formRow($cfs->get(ContactFieldset::OWNER));
+			?>
+			</div>
+		</fieldset>
+		<div class="clearfix"></div>
+		<div class="inner-grid-8 alpha">
+			<fieldset>
+				<legend>Miscellaneous</legend>
+				<?php
+				echo $this->formRow($cfs->get(ContactFieldset::ASSISTANT));
+				echo $this->formRow($cfs->get(ContactFieldset::ASSISTANTPHONE));
+				echo $this->formRow($cfs->get(ContactFieldset::ASSISTANTEMAIL));
+				echo $this->formRow($cfs->get(ContactFieldset::BIRTHDATE));
+				echo $this->formRow($cfs->get(ContactFieldset::WEBSITE));
+				echo $this->formRow($cfs->get(ContactFieldset::INTERESTS));
+				?>
+			</fieldset>
+		</div>
+		<div class="inner-grid-4 omega">
+			<fieldset>
+				<legend>Warnings</legend>
+				<?php
+				echo $this->formRow($cfs->get(ContactFieldset::DONOTCALL));
+				echo $this->formRow($cfs->get(ContactFieldset::DONOTMAIL));
+				echo $this->formRow($cfs->get(ContactFieldset::DONOTEMAIL));
+				?>
+			</fieldset>
+		</div>
+		<div class="clearfix"></div>
+		<fieldset>
+			<legend>Notes</legend>
+			<?php echo $this->formRow($cfs->get(ContactFieldset::DESCRIPTION)); ?>
+		</fieldset>
+	</div>
+	<?php echo $this->form()->closeTag(); ?>
+</div>
+<div class="clearfix"></div>
+<div class="grid_12">
+	<div class="bottom-status-bar"><?php echo $this->statusMessage; ?></div>
+</div>

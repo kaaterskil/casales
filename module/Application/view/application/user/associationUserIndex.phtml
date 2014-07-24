@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: associationUserIndex.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Model\User;
+
+/* @var $user User */
+?>
+<h2>Users</h2>
+<div class="tabbed-table-container-6">
+	<table>
+		<thead class="fixed-thead">
+			<tr>
+				<th width="250" class="first">Full Name</th>
+				<th width="350">Title</th>
+				<th width="313">Status</th>
+			</tr>
+		</thead>
+		<tbody class="scrollable-tbody">
+			<?php if(count($this->users)) : ?>
+			<?php foreach ($this->users as $user) : ?>
+			<tr>
+				<td width="250" class="first"><?php echo $user->getFullName(); ?></td>
+				<td width="350"><?php echo $user->getJobTitle(); ?></td>
+				<td width="297"><?php echo ($user->getIsDisabled() ? 'Disabled' : 'Enabled'); ?></td>
+			</tr>
+				<?php endforeach; ?>
+				<?php else : ?>
+			<tr>
+				<td colspan="3" class="first" width="913">No records found.</td>
+			</tr>
+			<?php endif; ?>
+		</tbody>
+	</table>
+</div>

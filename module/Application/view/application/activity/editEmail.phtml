@@ -1,0 +1,252 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: editEmail.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Form\ActivityForm;
+use Application\Form\BaseActivityFieldset;
+use Application\Form\InteractionFieldset;
+use Application\Form\EmailFieldset;
+
+use Application\Model\Attachment;
+use Application\Model\EmailInteraction;
+use Application\Model\ActivityState;
+use Application\Model\EmailStatus;
+
+/* @var $activity EmailInteraction */
+/* @var $attachment Attachment */
+/* @var $form ActivityForm */
+/* @var $afs BaseActivityFieldset */
+
+// Set page title
+$this->headTitle()->append($this->pageTitle);
+$this->headTitle()->append('Casales');
+
+$activity = $this->activity;
+$form = $this->form;
+
+// Set the form attributes
+$form->setAttributes(array(
+	'action' => $this->url('activity', array(
+		'action' => 'edit',
+		'id' => $this->id,
+		'type' => $this->type,
+		'entityId' => $this->entityId,
+		'entityRoute' => $this->entityRoute,
+	)),
+	'method' => 'post',
+	'name' => 'activity-edit',
+));
+
+// Prepare the form elements
+$submitButtonValue = ($activity->getState() == ActivityState::OPEN ? 'Save' : 'Close');
+$form->get(ActivityForm::SUBMIT)->setValue( $submitButtonValue );
+$form->prepare();
+
+// Get the fieldset
+$afs = $form->get(BaseActivityFieldset::FIELDSETNAME);
+
+$closeActivityParams = array(
+	'caf' => $this->caf,
+	'entityId' => $this->entityId,
+	'entityRoute' => $this->entityRoute,
+	'id' => $this->id,
+	'type' => $this->type,
+);
+$auditIndexParams = array(
+	'auditItems' => $this->auditItems
+);
+?>
+<script type="text/javascript">
+tinymce.init({
+    selector : "textarea"
+ });
+</script>
+<div class="grid_12">
+	<div class="entity-type">Activity</div>
+	<h1 class="page-title">
+		<?php echo $this->pageTitle; ?>
+	</h1>
+	
+	<ul class="tabs">
+		<li><a href="#" id="tab-1" title="tab-content-1" class="tab front">General</a></li>
+		<li><a href="#" id="tab-2" title="tab-content-2" class="tab">Audit</a></li>
+	</ul>
+	
+	<?php if($activity->getState() == ActivityState::OPEN) : ?>
+	<div id="tab-content-1" class="tab-content">
+		<?php
+		echo $this->form()->openTag($form);
+		echo $this->formRow($afs->get(BaseActivityFieldset::ID));
+		echo $this->formRow($afs->get(BaseActivityFieldset::DISCRIMINATOR));
+		echo $this->formRow($afs->get(BaseActivityFieldset::ACCOUNT));
+		echo $this->formRow($afs->get(BaseActivityFieldset::CAMPAIGN));
+		echo $this->formRow($afs->get(BaseActivityFieldset::CONTACT));
+		echo $this->formRow($afs->get(BaseActivityFieldset::LEAD));
+		echo $this->formRow($afs->get(BaseActivityFieldset::OPPORTUNITY));
+		echo $this->formRow($afs->get(BaseActivityFieldset::OWNER));
+		?>
+		<div>
+		<?php
+		echo $this->formRow($afs->get(EmailFieldset::TO));
+		echo $this->formRow($afs->get(EmailFieldset::CC));
+		echo $this->formRow($afs->get(EmailFieldset::BCC));
+		echo $this->formRow($afs->get(EmailFieldset::SUBJECT));
+		echo $this->formRow($afs->get(EmailFieldset::FILEUPLOAD));
+		echo $this->formElement($afs->get(EmailFieldset::DESCRIPTION));
+		?>
+		</div>
+
+		<div class="inner-grid-6 alpha">
+			<fieldset>
+				<legend>Notifications</legend>
+				<?php
+				echo $this->formRow($afs->get(EmailFieldset::DELIVERYRECEIPTREQUESTED));
+				echo $this->formRow($afs->get(EmailFieldset::READRECEIPTREQUESTED));
+				?>
+			</fieldset>
+		</div>
+		<div class="inner-grid-6 omega">
+			<fieldset>
+				<legend>Send Options</legend>
+				<?php
+				echo $this->formRow($afs->get(EmailFieldset::PRIORITY));
+				echo $this->formRow($afs->get(EmailFieldset::STATUS));
+				echo $this->formRow($afs->get(EmailFieldset::ISSUESEND));
+				echo $this->formRow($form->get(ActivityForm::SUBMITCLOSE));
+				if($activity->getCampaignActivity() != null) :
+				$href = $this->url('activity', array(
+					'action' => 'promoteToResponse',
+					'id' => $this->id,
+					'type' => $this->type,
+					'entityId' => $this->id,
+					'entityRoute' => $this->entityRoute,
+				));
+				?>
+				<a href="<?php echo $href; ?>" class="button lfloat">Promote to Response</a>
+				<?php endif; ?>
+			</fieldset>
+		</div>
+		<div class="clearfix"></div>
+	<?php echo $this->form()->closeTag(); ?>
+	</div>
+	<?php else : ?>
+	<div id="tab-content-1" class="tab-content">
+		<?php
+		echo $this->form()->openTag($form);
+		echo $this->formRow($afs->get(BaseActivityFieldset::ID));
+		echo $this->formRow($afs->get(BaseActivityFieldset::DISCRIMINATOR));
+		echo $this->formRow($afs->get(BaseActivityFieldset::ACCOUNT));
+		echo $this->formRow($afs->get(BaseActivityFieldset::CAMPAIGN));
+		echo $this->formRow($afs->get(BaseActivityFieldset::CONTACT));
+		echo $this->formRow($afs->get(BaseActivityFieldset::LEAD));
+		echo $this->formRow($afs->get(BaseActivityFieldset::OPPORTUNITY));
+		echo $this->formRow($afs->get(BaseActivityFieldset::OWNER));
+		echo $this->formRow($afs->get(EmailFieldset::TO));
+		echo $this->formRow($afs->get(EmailFieldset::SUBJECT));
+		echo $this->formRow($afs->get(EmailFieldset::STATUS));
+		?>
+		<div class="closed-email-container">
+			<h2 class="closed-email-subject"><?php echo $activity->getSubject(); ?></h2>
+			<div class="input-no-edit-container">
+				<div class="input-label-no-edit">From:</div>
+				<div><?php echo htmlspecialchars($activity->getFrom()); ?></div>
+			</div>
+			<div class="input-no-edit-container">
+				<div class="input-label-no-edit">Sent:</div>
+				<div><?php echo $activity->getFormattedActualEnd('D n/d/Y g:i A'); ?></div>
+			</div>
+			<div class="input-no-edit-container">
+				<div class="input-label-no-edit">To:</div>
+				<div><?php echo htmlspecialchars($activity->getTo()); ?></div>
+			</div>
+			<div class="input-no-edit-container">
+				<div class="input-label-no-edit">Cc:</div>
+				<div><?php echo $activity->getCc(); ?></div>
+			</div>
+			<div class="input-no-edit-container">
+				<div class="input-label-no-edit">Bcc:</div>
+				<div><?php echo $activity->getBcc(); ?></div>
+			</div>
+			<div class="input-no-edit-container">
+				<div class="input-label-no-edit">Attachment:</div>
+				<?php
+				$attachments = '';
+				if($activity->getAttachments()->count()) {
+					foreach ($activity->getAttachments() as $attachment) {
+						$attachments .= $attachment->getSubject() . ', ';
+					}
+					$attachments = substr($attachments, 0, -2);
+				}
+				?>
+				<div><?php echo $attachments; ?></div>
+			</div>
+			<div class="closed-email-body"><?php echo $activity->getDescription(); ?></div>
+		</div>
+
+		<div class="inner-grid-6 alpha">
+			<fieldset>
+				<legend>Notifications</legend>
+				<div class="input-no-edit-container">
+					<div class="input-label-no-edit">Delivery Receipt</div>
+					<?php if($activity->getDeliveryReceiptRequested()) : ?>
+					<div>&#x2714;</div>
+					<?php endif; ?>
+				</div>
+				<div class="input-no-edit-container">
+					<div class="input-label-no-edit">Read Receipt</div>
+					<?php if($activity->getReadReceiptRequested()) : ?>
+					<div>&#x2714;</div>
+					<?php endif; ?>
+				</div>
+			</fieldset>
+		</div>
+		<div class="inner-grid-6 omega">
+			<div class="button-container">
+				<?php echo $this->formRow($form->get(ActivityForm::SUBMITCLOSE));
+				if($activity->getCampaignActivity() != null) :
+				$href = $this->url('activity', array(
+					'action' => 'promoteToResponse',
+					'id' => $this->id,
+					'type' => $this->type,
+					'entityId' => $this->id,
+					'entityRoute' => $this->entityRoute,
+				));
+				?>
+				<a href="<?php echo $href; ?>" class="button lfloat">Promote to Response</a>
+				<?php endif; ?>
+				<a href="#" id="openCloseActivityForm" class="button lfloat mll">Close Activity</a>
+			</div>
+		</div>
+		<div class="clearfix"></div>
+		<?php echo $this->form()->closeTag(); ?>
+	</div>
+	
+	<div id="tab-content-2" class="tab-content">
+	<?php echo $this->partial('application/audit/associationAuditIndex.phtml', $auditIndexParams); ?>
+	</div>
+	<?php endif; ?>
+
+	<div id="close-activity-container" class="<?php echo $this->closeActivityContainerClass; ?>">
+	<?php echo $this->partial('application/activity/closeActivityForm.phtml', $closeActivityParams); ?>
+	</div>
+</div>
+<div class="clearfix"></div>
+<div class="grid_12">
+	<div class="bottom-status-bar"><?php echo $this->statusMessage; ?></div>
+</div>

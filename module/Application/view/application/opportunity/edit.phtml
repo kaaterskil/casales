@@ -1,0 +1,197 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: edit.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Form\OpportunityForm;
+use Application\Form\OpportunityFieldset;
+
+use Application\Model\Account;
+use Application\Model\Contact;
+use Application\Model\InitialContact;
+use Application\Model\Opportunity;
+use Application\Model\OpportunityStatus;
+use Application\Model\Stage;
+use Application\Model\OpportunityState;
+
+/* @var $form OpportunityForm */
+/* @var $ofs OpportunityFieldset */
+/* @var $obj Opportunity */
+
+// Set page title
+$this->headTitle()->append($this->pageTitle);
+$this->headTitle()->append('Casales');
+
+$form = $this->form;
+$obj = $this->opportunity;
+
+// Set the form attributes
+$form->setAttributes(array(
+	'action' => $this->url('opportunity', array('action' => 'edit', 'id' => $this->id)),
+	'method' => 'post',
+	'name' => 'opportunity-edit',
+));
+$form->prepare();
+
+// Other variables
+$ofs = $form->get(OpportunityFieldset::FIELDSETNAME);
+$activityIndexParams = array(
+	'openActivities' => $this->openActivities,
+	'closedActivities' => $this->closedActivities,
+	'entityId' => $this->id,
+	'entityRoute' => 'opportunity',
+);
+$loseOpportunityParams = array(
+	'loseOpportunityForm' => $this->loseOpportunityForm,
+	'id' => $this->id
+);
+$winOpportunityParams = array(
+	'winOpportunityForm' => $this->winOpportunityForm,
+	'id' => $this->id
+);
+$auditIndexParams = array(
+	'auditItems' => $this->auditItems
+);
+?>
+<div class="grid_12">
+	<div class="entity-type">Opportunity</div>
+	<h1 class="page-title">
+		<?php echo $this->pageTitle; ?>
+	</h1>
+
+	<ul class="tabs">
+		<li><a href="#" id="tab-1" title="tab-content-1" class="tab front">General</a></li>
+		<li><a href="#" id="tab-2" title="tab-content-2" class="tab">Details</a></li>
+		<li><a href="#" id="tab-3" title="tab-content-3" class="tab">Activities</a></li>
+		<li><a href="#" id="tab-5" title="tab-content-5" class="tab">Audit</a></li>
+	</ul>
+
+	<?php echo $this->form()->openTag($form); ?>
+	<div id="tab-content-1" class="tab-content">
+		<div class="button-container">
+			<?php echo $this->formRow($form->get(OpportunityForm::SUBMIT)); ?>
+			<?php echo $this->formRow($form->get(OpportunityForm::SUBMITCLOSE)); ?>
+			<?php if ($obj->getState() == OpportunityState::OPEN) : ?>
+			<a id="openLoseOpportunityButton" class="button lfloat mrl mbs" href="#">Close as Lost</a>
+			<a id="openWinOpportunityButton" class="button lfloat mbs" href="#">Close as Won</a>
+			<?php endif; ?>
+		</div>
+		<div class="clearfix"></div>
+		<?php echo $this->formRow($ofs->get(OpportunityFieldset::ID)); ?>
+		<fieldset>
+			<legend>General</legend>
+			<div class="inside-fieldset-left">
+			<?php echo $this->formRow($ofs->get(OpportunityFieldset::NAME)); ?>
+			<?php echo $this->formRow($ofs->get(OpportunityFieldset::ACCOUNT)); ?>
+			<?php echo $this->formRow($ofs->get(OpportunityFieldset::CONTACT)); ?>
+			<?php echo $this->formRow($ofs->get(OpportunityFieldset::ORIGINATINGLEAD)); ?>
+			</div>
+			<div class="inside-fieldset-right">
+			<?php echo $this->formRow($ofs->get(OpportunityFieldset::OWNER)); ?>
+			</div>
+		</fieldset>
+		<div class="clearfix"></div>
+		<fieldset>
+			<legend>Revenue</legend>
+			<div class="inside-fieldset-left">
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::ESTIMATEDVALUE)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::ESTIMATEDCLOSEDATE)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::CLOSEPROBABILITY)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::OPPORTUNITYRATING)); ?>
+			</div>
+			<div class="inside-fieldset-right">
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::ACTUALVALUE)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::ACTUALCLOSEDATE)); ?>
+			</div>
+		</fieldset>
+		<div class="clearfix"></div>
+		<fieldset>
+			<legend>Description</legend>
+			<?php echo $this->formRow($ofs->get(OpportunityFieldset::DESCRIPTION)); ?>
+		</fieldset>
+	</div>
+
+	<div id="tab-content-2" class="tab-content">
+		<div class="button-container">
+			<?php echo $this->formRow($form->get(OpportunityForm::SUBMIT)); ?>
+			<?php echo $this->formRow($form->get(OpportunityForm::SUBMITCLOSE)); ?>
+		</div>
+		<div class="clearfix"></div>
+		<fieldset>
+			<legend>Profile</legend>
+			<div class="inside-fieldset-left">
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::STATUS)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::PRIORITY)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::SALESSTAGE)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::STEP)); ?>
+			</div>
+			<div class="inside-fieldset-right">
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::CONFIRMINTEREST)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::DECISIONMAKER)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::NEED)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::PURCHASEPROCESS)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::PURCHASETIMEFRAME)); ?>
+			</div>
+			<div class="clearfix"></div>
+			<?php echo $this->formRow($ofs->get(OpportunityFieldset::CUSTOMERNEED)); ?>
+			<?php echo $this->formRow($ofs->get(OpportunityFieldset::CUSTOMERPAINPOINTS)); ?>
+		</fieldset>
+		<fieldset>
+			<legend>Action</legend>
+			<div class="inside-fieldset-left">
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::INITIALCONTACT)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::EVALUATEFIT)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::DEVELOPPROPOSAL)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::PRESENTPROPOSAL)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::PURSUITDECISION)); ?>
+			</div>
+			<div class="inside-fieldset-right">
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::TIMELINE)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::FINALDECISIONDATE)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::SCHEDULEFOLLOWUPQUALIFY)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::SCHEDULEFOLLOWUPPROSPECT)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::SCHEDULEPROPOSALMEETING)); ?>
+				<?php echo $this->formRow($ofs->get(OpportunityFieldset::SENDTHANKYOU)); ?>
+			</div>
+		</fieldset>
+		<div class="clearfix"></div>
+	</div>
+	<?php echo $this->form()->closeTag(); ?>
+	
+	<div id="tab-content-3" class="tab-content">
+	<?php echo $this->navigation( $this->navigation )->menu()->renderMenu( null, array('ulClass' => 'ribbon') ); ?>
+	<?php echo $this->partial('application/activity/associationActivityIndex.phtml', $activityIndexParams); ?>
+	</div>
+	
+	<div id="tab-content-5" class="tab-content">
+	<?php echo $this->partial('application/audit/associationAuditIndex.phtml', $auditIndexParams); ?>
+	</div>
+
+	<div id="lose-opportunity-container" class="<?php echo $this->loseOpportunityContainerClass; ?>">
+	<?php echo $this->partial('application/opportunity/loseOpportunity.phtml', $loseOpportunityParams); ?>
+	</div>
+
+	<div id="win-opportunity-container" class="<?php echo $this->winOpportunityContainerClass; ?>">
+	<?php echo $this->partial('application/opportunity/winOpportunity.phtml', $winOpportunityParams); ?>
+	</div>
+</div>
+<div class="clearfix"></div>
+<div class="grid_12">
+	<div class="bottom-status-bar"><?php echo $this->statusMessage; ?></div>
+</div>
+	

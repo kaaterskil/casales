@@ -1,0 +1,90 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: index.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Model\Contact;
+use Application\Model\AddressDTO;
+
+/* @var $obj Contact */
+/* @var $address AddressDTO */
+
+// Set page title
+$this->headTitle()->append($this->pageTitle);
+$this->headTitle()->append('Casales');
+?>
+<div class="grid_12">
+	<div class="entity-type">Contact</div>
+	<h1 class="page-title">
+		<?php echo $this->pageTitle; ?>
+	</h1>
+	<div>
+		<a accesskey="n" class="mll" href="<?php echo $this->url('contact', array('action' => 'create')); ?>">Create New</a>
+	</div>
+	<div>
+		<?php echo $this->partial('application/contact/queryForm.phtml', array('form' => $this->form)); ?>
+	</div>
+	<div class="table-container-with-query">
+		<table>
+			<thead class="fixed-thead">
+				<tr>
+					<th width="70"></th>
+					<th width="210">Name</th>
+					<th width="220">Email</th>
+					<th width="110">Telephone</th>
+					<th width="200">Account</th>
+					<th width="80">City</th>
+					<th width="48">State</th>
+				</tr>
+			</thead>
+			<tbody class="scrollable-tbody">
+				<?php if(count($this->recordSet)) : ?>
+				<?php foreach ($this->recordSet as $obj) : ?>
+				<?php
+				$account = '';
+				if($obj->getAccount()) {
+					$link = $this->url('account', array('action'=> 'edit', 'id' => $obj->getAccount()->getId()));
+					$account = '<a href="' . $link . '">' . $obj->getShortAccountName() . '</a>';
+				}
+				$address = $obj->getPrimaryAddress();
+				?>
+				<tr>
+					<td width="70" align="center"><a
+						href="<?php echo $this->url('contact', array('action' => 'edit', 'id' => $obj->getId())); ?>">Edit</a> <a
+						href="<?php echo $this->url('contact', array('action' => 'delete', 'id' => $obj->getId())); ?>">Delete</a></td>
+					<td width="210"><?php echo $obj->getDisplayName(); ?></td>
+					<td width="220"><?php echo $obj->getEmailLink(); ?></td>
+					<td width="110"><?php echo $obj->getPrimaryTelephone(); ?></td>
+					<td width="200"><?php echo $account; ?></td>
+					<td width="80"><?php echo $address->getCity(); ?></td>
+					<td width="32"><?php echo $address->getRegion(); ?></td>
+				</tr>
+				<?php endforeach; ?>
+				<?php else : ?>
+				<tr>
+					<td colspan="10" class="no-records">No records found.</td>
+				</tr>
+				<?php endif; ?>
+		</tbody>
+		</table>
+	</div>
+</div>
+<div class="clearfix"></div>
+<div class="grid_12">
+	<div class="bottom-status-bar"><?php echo $this->statusMessage; ?></div>
+</div>

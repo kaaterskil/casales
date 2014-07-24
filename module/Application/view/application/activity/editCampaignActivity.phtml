@@ -1,0 +1,201 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: editCampaignActivity.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Form\ActivityForm;
+use Application\Form\BaseActivityFieldset;
+use Application\Form\AppointmentFieldset;
+use Application\Form\CampaignActivityFieldset;
+use Application\Form\TaskFieldset;
+use Application\Form\NoteFieldset;
+use Application\Form\InteractionFieldset;
+use Application\Form\EmailFieldset;
+use Application\Form\FaxFieldset;
+use Application\Form\LetterFieldset;
+use Application\Form\TelephoneInteractionFieldset;
+use Application\Form\VisitFieldset;
+
+use Application\Model\AbstractActivity;
+use Application\Model\LetterInteraction;
+
+/* @var $form ActivityForm */
+/* @var $afs BaseActivityFieldset */
+
+// Set page title
+$this->headTitle()->append($this->pageTitle);
+$this->headTitle()->append('Casales');
+
+$form = $this->form;
+
+// Set the form attributes
+$form->setAttributes(array(
+	'action' => $this->url('activity', array(
+		'action' => 'edit',
+		'id' => $this->id,
+		'type' => $this->type,
+		'entityId' => $this->entityId,
+		'entityRoute' => $this->entityRoute,
+	)),
+	'method' => 'post',
+	'name' => 'activity-edit',
+));
+
+// Prepare the form elements
+$form->get(ActivityForm::SUBMIT)->setValue('Save');
+$form->prepare();
+
+// Get the fieldset
+$afs = $form->get(BaseActivityFieldset::FIELDSETNAME);
+$marketingLisParams = array(
+	'entityId' => $this->entityId,
+	'entityRoute' => $this->entityRoute,
+	'id' => $this->id,
+	'marketingLists' => $this->marketingLists
+);
+$listQueryParams = array(
+	'entityId' => $this->entityId,
+	'entityRoute' => $this->entityRoute,
+	'id' => $this->id,
+	'queryForm' => $this->queryForm,
+	'recordSet' => $this->recordSet
+);
+$distributeActivityParams = array(
+	'channel' => $this->channel,
+	'channelType' => $this->channelType,
+	'df' => $this->df,
+	'entityId' => $this->entityId,
+	'entityRoute' => $this->entityRoute,
+	'id' => $this->id,
+	'pageSubTitle' => $this->pageSubTitle,
+	'type' => $this->type,
+);
+$activityIndexParams = array(
+	'closedActivities' => $this->closedActivities,
+	'entityId' => $this->entityId,
+	'entityRoute' => $this->entityRoute,
+	'openActivities' => $this->openActivities,
+);
+$auditIndexParams = array(
+	'auditItems' => $this->auditItems
+);
+?>
+<div class="grid_12">
+	<div class="entity-type">Campaign Activity</div>
+	<h1 class="page-title">
+		<?php echo $this->pageTitle; ?>
+	</h1>
+
+	<ul class="tabs">
+		<li><a href="#" id="tab-1" title="tab-content-1" class="tab<?php echo ($this->front == 'tab-1' ? ' front' : ''); ?>">General</a></li>
+		<li><a href="#" id="tab-4" title="tab-content-4" class="tab<?php echo ($this->front == 'tab-4' ? ' front' : ''); ?>"><?php echo $this->indexTabTitle; ?></a></li>
+		<li><a href="#" id="tab-2" title="tab-content-2" class="tab<?php echo ($this->front == 'tab-2' ? ' front' : ''); ?>">Marketing
+				Lists</a></li>
+		<li><a href="#" id="tab-3" title="tab-content-3" class="tab<?php echo ($this->front == 'tab-3' ? ' front' : ''); ?>">Find
+				Lists</a></li>
+		<li><a href="#" id="tab-5" title="tab-content-5" class="tab<?php echo ($this->front == 'tab-5' ? ' front' : ''); ?>">Audit</a></li>
+	</ul>
+
+	<div id="tab-content-1" class="tab-content">
+		<?php echo $this->form()->openTag($form); ?>
+		<div class="button-container">
+			<?php
+			echo $this->formRow($form->get(ActivityForm::SUBMIT));
+			echo $this->formRow($form->get(ActivityForm::SUBMITCLOSE));
+			?>
+			<a id="openDistributeActivityButton" class="button lfloat mbs" href="#">Distribute Campaign Activity</a>
+		</div>
+		<div class="clearfix"></div>
+		
+		<?php echo $this->formRow($afs->get(BaseActivityFieldset::ID)); ?>
+		<?php echo $this->formRow($afs->get(BaseActivityFieldset::DISCRIMINATOR)); ?>
+		<fieldset>
+			<legend>General</legend>
+			<?php echo $this->formRow($afs->get(BaseActivityFieldset::SUBJECT)); ?>
+			<div class="inside-fieldset-left">
+				<?php
+				echo $this->formRow($afs->get(CampaignActivityFieldset::CAMPAIGN));
+				echo $this->formRow($afs->get(CampaignActivityFieldset::CHANNEL));
+				echo $this->formRow($afs->get(CampaignActivityFieldset::OWNER));
+				?>
+			</div>
+			<div class="inside-fieldset-right">
+				<?php
+				if($afs instanceof CampaignActivityFieldset) {
+					echo $this->formRow($afs->get(CampaignActivityFieldset::STATUS));
+					echo $this->formRow($afs->get(CampaignActivityFieldset::PRIORITY));
+					echo $this->formRow($afs->get(CampaignActivityFieldset::TYPECODE));
+				} elseif ($afs instanceof NoteFieldset) {
+					echo $this->formRow($afs->get(NoteFieldset::PRIORITY));
+				} elseif ($afs instanceof InteractionFieldset) {
+					echo $this->formRow($afs->get(InteractionFieldset::DIRECTION));
+				} elseif ($afs instanceof FaxFieldset) {
+					echo $this->formRow($afs->get(FaxFieldset::TELEPHONE));
+				} elseif ($afs instanceof TelephoneInteractionFieldset) {
+					echo $this->formRow($afs->get(TelephoneInteractionFieldset::TELEPHONE));
+					echo $this->formRow($afs->get(TelephoneInteractionFieldset::LEFTVOICEMAIL));
+				}
+				?>
+			</div>
+		</fieldset>
+		<div class="clearfix"></div>
+
+		<fieldset>
+			<legend>Status</legend>
+			<div class="inside-fieldset-left">
+				<?php echo $this->formRow($afs->get(CampaignActivityFieldset::SCHEDULEDSTART)); ?>
+				<?php echo $this->formRow($afs->get(CampaignActivityFieldset::SCHEDULEDEND)); ?>
+			</div>
+			<div class="inside-fieldset-right">
+				<?php echo $this->formRow($afs->get(CampaignActivityFieldset::ACTUALSTART)); ?>
+				<?php echo $this->formRow($afs->get(CampaignActivityFieldset::ACTUALEND)); ?>
+			</div>
+		</fieldset>
+		<div class="clearfix"></div>
+
+		<fieldset>
+			<legend>Notes</legend>
+			<?php echo $this->formRow($afs->get(BaseActivityFieldset::DESCRIPTION)); ?>
+		</fieldset>
+		<?php echo $this->form()->closeTag(); ?>
+	</div>
+
+	<div id="tab-content-4" class="tab-content">
+		<?php echo $this->partial('application/activity/distributionActivityIndex.phtml', $activityIndexParams); ?>
+	</div>
+
+	<div id="tab-content-2" class="tab-content">
+	<?php echo $this->partial('application/activity/MarketingListIndex.phtml', $marketingLisParams); ?>
+	</div>
+
+	<div id="tab-content-3" class="tab-content">
+		<?php echo $this->partial('application/activity/listQuery.phtml', $listQueryParams); ?>
+	</div>
+	
+	<div id="tab-content-5" class="tab-content">
+	<?php echo $this->partial('application/audit/associationAuditIndex.phtml', $auditIndexParams); ?>
+	</div>
+
+	<div id="distribute-activity-container" class="<?php echo $this->distributeActivityContainerClass; ?>">
+	<?php echo $this->partial('application/activity/distributeActivity.phtml', $distributeActivityParams); ?>
+	</div>
+</div>
+<div class="clearfix"></div>
+<div class="grid_12">
+	<div class="bottom-status-bar"><?php echo $this->statusMessage; ?></div>
+</div>

@@ -1,0 +1,57 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: associationAuditIndex.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Model\Audit;
+
+/* @var $audit Audit */
+?>
+<h2>Audit</h2>
+<div class="tabbed-table-container-6">
+	<table>
+		<thead class="fixed-thead">
+			<tr>
+				<th width="140" class="first">Changed Date</th>
+				<th width="110">Changed By</th>
+				<th width="80">Event</th>
+				<th width="120">Property</th>
+				<th width="220">Old Value</th>
+				<th width="243">New Value</th>
+			</tr>
+		</thead>
+		<tbody class="scrollable-tbody">
+			<?php if(count($this->auditItems)) : ?>
+			<?php foreach ($this->auditItems as $audit) : ?>
+			<tr>
+				<td width="140" class="first"><?php echo $audit->getCreationDate()->format('D n/d/Y g:i A'); ?></td>
+				<td width="110"><?php echo $audit->getUser()->getFullName(); ?></td>
+				<td width="80"><?php echo $audit->getAction(); ?></td>
+				<td width="120"><?php echo $audit->getPrettyProperty(); ?></td>
+				<td width="220"><?php echo $audit->getOldData(); ?></td>
+				<td width="227"><?php echo $audit->getNewData(); ?></td>
+			</tr>
+				<?php endforeach; ?>
+				<?php else : ?>
+			<tr>
+				<td colspan="6" class="first" width="913">No records found.</td>
+			</tr>
+			<?php endif; ?>
+		</tbody>
+	</table>
+</div>

@@ -1,0 +1,182 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: emailIndex.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Model\Attachment;
+use Application\Model\Direction;
+use Application\Model\EmailInteraction;
+
+/* @var $attachment Attachment */
+/* @var $email1 EmailInteraction */
+/* @var $email2 EmailInteraction */
+
+// Set page title
+$this->headTitle()->append( $this->pageTitle );
+$this->headTitle()->append( 'Casales' );
+?>
+<div class="grid_12">
+	<div class="entity-type">Mail</div>
+	<h1 class="page-title"><?php echo $this->pageTitle; ?></h1>
+
+	<div class="grid_6 alpha">
+		<div class="button-container mbl">
+			<a id="received-mail-button" class="button lfloat mrl<?php echo $this->receiveMailClass;?>"
+				href="<?php echo $this->url('mail', array('action' => 'receive')); ?>">Sync Inbox</a> <a id="inbox-button"
+				class="button lfloat mrl<?php echo $this->inboxClass; ?>"
+				href="<?php echo $this->url('mail', array('action' => 'index')); ?>">Inbox</a> <a id="sent-mail-button"
+				class="button lfloat<?php echo $this->sentClass; ?>"
+				href="<?php echo $this->url('mail', array('action' => 'sent')); ?>">Sent Mail</a>
+		</div>
+
+		<div class="email-table-container">
+			<table>
+				<thead class="fixed-thead">
+					<tr>
+						<th width="50" align="center"></th>
+						<th width="310">Subject</th>
+						<th width="98">Date</th>
+					</tr>
+				</thead>
+				<tbody class="scrollable-tbody">
+				<?php if(count($this->mail)) : ?>
+				<?php foreach ($this->mail as $email1) : ?>
+						<?php
+						$contactOrLead = '';
+						if ($email1->getDirection() == Direction::INBOUND) {
+							$contactOrLead = strtok( $email1->getFrom(), '<' );
+						} else {
+							if ($email1->getContact()) {
+								$contactOrLead = $email1->getContact()->getDisplayName();
+							} elseif ($email1->getLead()) {
+								$contactOrLead = $email1->getLead()->getDisplayName();
+							}
+						}
+						$contactOrLeadHref = '';
+						if ($email1->getContact()) {
+							$contactOrLeadHref = $this->url( 'contact', array(
+								'action' => 'edit',
+								'id' => $email1->getContact()
+									->getId()
+							) );
+						} elseif ($email1->getLead()) {
+							$contactOrLeadHref = $this->url( 'lead', array(
+								'action' => 'edit',
+								'id' => $email1->getLead()
+									->getId()
+							) );
+						}
+						$mailbox = ($email1->getDirection() == Direction::INBOUND ? 'inbox' : 'sent');
+						$deleteHref = $this->url( 'mail', array(
+							'action' => 'delete',
+							'id' => $email1->getId(),
+							'mailbox' => $mailbox
+						) );
+						?>
+				<tr class="incoming-email" data-id="<?php echo $email1->getId(); ?>">
+						<td width="50" align="center"><a href="<?php echo $deleteHref; ?>">Delete</a></td>
+						<td width="392" colspan="2">
+							<div class="mail-index-item-xontainer">
+								<div class="mail-index-item-from">
+									<a href="<?php echo $contactOrLeadHref ?>" target="_blank"><?php echo $contactOrLead; ?></a>
+								</div>
+								<div class="mail-index-item-date"><?php echo $email1->getFormattedActualEnd('m/d/Y') ?></div>
+								<div class="mail-index-item-subject"><?php echo $email1->getSubject(); ?></div>
+							</div>
+						</td>
+					</tr>
+				<?php endforeach; ?>
+				<?php else : ?>
+				<tr>
+						<td class="no-records" colspan="3">No records found.</td>
+					</tr>
+				<?php endif; ?>
+			</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="grid_6 omega mbl">
+	<?php if(count($this->mail)) : ?>
+	<?php foreach ($this->mail as $email2) : ?>
+		<div id="<?php echo 'mail-item-' . $email2->getId(); ?>" class="mail-item-outer-container hidden">
+			<div class="button-container mbl">
+				<a class="<?php echo 'button' . $this->receiveMailClass; ?>"
+					href="<?php echo $this->url('mail', array('action' => 'reply', 'id' => $email2->getId())); ?>">Reply</a>
+			</div>
+			<div class="mail-item-container">
+				<?php
+				$attachments = '';
+				if($email2->getAttachments()->count()) {
+					foreach ($email2->getAttachments() as $attachment) {
+						$attachmentLink = '/data/uploads/' . $attachment->getSubject();
+						$attachments .= '<a class="email-attachment" data-id="' . $attachment->getId() . '" href="#">' . $attachment->getSubject() . '</a>, ';
+					}
+					$attachments = substr($attachments, 0, -2);
+				}
+				$description = $email2->getDescription();
+				if($email2->getMimetype() == 'text/plain') {
+					$description = nl2br($description);
+				}
+				?>
+				<table class="no-style">
+					<thead>
+						<th width="70"></th>
+						<th width="378"></th>
+					</thead>
+					<tbody>
+						<tr>
+							<td colspan="2"><h2 class="closed-email-subject"><?php echo $email2->getSubject(); ?></h2></td>
+						</tr>
+						<tr>
+							<td colspan="2"><span class="closed-email-subject"><?php echo htmlspecialchars($email2->getFrom()); ?></span></td>
+						</tr>
+						<tr>
+							<td class="mail-label">Sent:</td>
+							<td><?php echo $email2->getFormattedActualEnd('D n/d/Y g:i A'); ?></td>
+						</tr>
+						<tr>
+							<td class="mail-label">To:</td>
+							<td><?php echo htmlspecialchars($email2->getTo()); ?></td>
+						</tr>
+						<tr>
+							<td class="mail-label">Cc:</td>
+							<td><?php echo htmlspecialchars($email2->getCc()); ?></td>
+						</tr>
+						<tr>
+							<td class="mail-label">Bcc:</td>
+							<td><?php echo htmlspecialchars($email2->getBcc()); ?></td>
+						</tr>
+						<tr>
+							<td class="mail-label">Attachment:</td>
+							<td><?php echo $attachments; ?></td>
+						</tr>
+						<tr>
+							<td colspan="2" style="border-top: 1px solid #999;"><?php echo $description; ?></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	<?php endforeach; ?>
+	<?php endif; ?>
+	</div>
+</div>
+<div class="clearfix"></div>
+<div class="grid_12">
+	<div class="bottom-status-bar"><?php echo $this->statusMessage; ?></div>
+</div>

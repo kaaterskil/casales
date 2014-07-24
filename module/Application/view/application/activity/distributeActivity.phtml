@@ -1,0 +1,234 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: distributeActivity.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Form\ActivityForm;
+use Application\Form\AppointmentFieldset;
+use Application\Form\BaseActivityFieldset;
+use Application\Form\EmailFieldset;
+use Application\Form\FaxFieldset;
+use Application\Form\InteractionFieldset;
+use Application\Form\LetterFieldset;
+use Application\Form\TelephoneInteractionFieldset;
+
+/* @var $df ActivityForm */
+/* @var dafs BaseActivityFieldset */
+
+$df = $this->df;
+
+// Set the form attributes
+$df->setAttributes(array(
+	'action' => $this->url('activity', array(
+		'action' => 'distribute',
+		'id' => $this->id,
+		'type' => $this->channel,
+		'entityId' => $this->entityId,
+		'entityRoute' => $this->entityRoute,
+	)),
+	'method' => 'post',
+	'name' => 'distribute-activity',
+));
+
+// Prepare the form elements
+$df->get(ActivityForm::SUBMIT)->setValue('Distribute');
+$df->prepare();
+
+// Get the fieldset
+$dafs = $df->get(BaseActivityFieldset::FIELDSETNAME);
+
+// Reset form element attributes for dialog window
+if($dafs instanceof EmailFieldset) {
+	$df->get( ActivityForm::SUBMIT )->setValue( 'Distribute and Send' );
+	$dafs->get(EmailFieldset::ISSUESEND)->setAttributes(array('id' => 'issueSendDistribute', 'class' => 'input-checkbox mbt'));
+	$dafs->get(EmailFieldset::FROM)->setAttribute('size', 128);
+	$dafs->get(EmailFieldset::TO)->setAttribute('size', 128);
+	$dafs->get(EmailFieldset::CC)->setAttribute('size', 128);
+	$dafs->get(EmailFieldset::BCC)->setAttribute('size', 128);
+	$dafs->get(EmailFieldset::SUBJECT)->setAttribute('size', 106);
+} elseif ($dafs instanceof InteractionFieldset) {
+	$dafs->get(InteractionFieldset::FROM)->setAttribute('size', 45);
+	$dafs->get(InteractionFieldset::TO)->setAttribute('size', 45);
+	$dafs->get(InteractionFieldset::SUBJECT)->setAttribute('size', 103);
+	$dafs->get(InteractionFieldset::DESCRIPTION)->setAttribute('cols', 146);
+	if($dafs instanceof TelephoneInteractionFieldset) {
+		$dafs->get(TelephoneInteractionFieldset::TELEPHONE)->setAttribute('size', 45);
+	}
+} elseif ($dafs instanceof AppointmentFieldset) {
+	$dafs->get(AppointmentFieldset::LOCATION)->setAttribute('size', 102);
+	$dafs->get(AppointmentFieldset::SUBJECT)->setAttribute('size', 102);
+}
+?>
+<script type="text/javascript">
+tinymce.init({
+    selector : "textarea.email",
+    menubar : false
+ });
+</script>
+<div class="distribute-activity-dialog">
+	<h2 class="dialog-title"><?php echo $this->channelType; ?></h2>
+	<div class="dialog-subtitle"><?php echo $this->pageSubTitle; ?></div>
+	
+	<?php echo $this->form()->openTag($df); ?>
+	<?php if($dafs instanceof EmailFieldset) : ?>
+		<?php
+		echo $this->formRow($dafs->get(BaseActivityFieldset::ID));
+		echo $this->formRow($dafs->get(BaseActivityFieldset::DISCRIMINATOR));
+		echo $this->formRow($dafs->get(BaseActivityFieldset::ACCOUNT));
+		echo $this->formRow($dafs->get(BaseActivityFieldset::CAMPAIGN));
+		echo $this->formRow($dafs->get(BaseActivityFieldset::CONTACT));
+		echo $this->formRow($dafs->get(BaseActivityFieldset::LEAD));
+		echo $this->formRow($dafs->get(BaseActivityFieldset::OPPORTUNITY));
+		echo $this->formRow($dafs->get(BaseActivityFieldset::OWNER));
+		?>
+		<div>
+		<?php
+		echo $this->formRow($dafs->get(EmailFieldset::FROM));
+		echo $this->formRow($dafs->get(EmailFieldset::TO));
+		echo $this->formRow($dafs->get(EmailFieldset::CC));
+		echo $this->formRow($dafs->get(EmailFieldset::BCC));
+		echo $this->formRow($dafs->get(EmailFieldset::SUBJECT));
+		echo $this->formRow($dafs->get(EmailFieldset::FILEUPLOAD));
+		echo $this->formElement($dafs->get(EmailFieldset::DESCRIPTION));
+		?>
+		</div>
+
+		<div class="inner-grid-5 alpha mts">
+			<fieldset>
+				<legend>Notifications</legend>
+				<?php
+				echo $this->formRow($dafs->get(EmailFieldset::DELIVERYRECEIPTREQUESTED));
+				echo $this->formRow($dafs->get(EmailFieldset::READRECEIPTREQUESTED));
+				?>
+			</fieldset>
+		</div>
+		<div class="inner-grid-5 omega mts">
+			<fieldset>
+				<legend>Send Options</legend>
+				<?php
+				echo $this->formRow($dafs->get(EmailFieldset::PRIORITY));
+				echo $this->formRow($dafs->get(EmailFieldset::STATUS));
+				echo $this->formRow($dafs->get(EmailFieldset::ISSUESEND));
+				?>
+				<div class="">
+					<?php echo $this->formRow($df->get(ActivityForm::SUBMITCLOSE)); ?>
+					<a id="closeDistributeActivityButton" class="button lfloat" href="#" title="Cancel">Cancel</a>
+				</div>
+			</fieldset>
+		</div>
+		<div class="clearfix"></div>
+		
+	<?php else : ?>
+		
+		<?php
+		echo $this->formRow($dafs->get(BaseActivityFieldset::ID));
+		echo $this->formRow($dafs->get(BaseActivityFieldset::DISCRIMINATOR));
+		echo $this->formRow($dafs->get(BaseActivityFieldset::ACCOUNT));
+		echo $this->formRow($dafs->get(BaseActivityFieldset::CAMPAIGN));
+		echo $this->formRow($dafs->get(BaseActivityFieldset::CONTACT));
+		echo $this->formRow($dafs->get(BaseActivityFieldset::LEAD));
+		echo $this->formRow($dafs->get(BaseActivityFieldset::OPPORTUNITY));
+		?>
+		
+		<?php if($dafs instanceof InteractionFieldset) : ?>
+		<fieldset>
+			<legend>General</legend>
+			<div class="dialog-inside-fieldset-left">
+			<?php
+			echo $this->formRow($dafs->get(InteractionFieldset::FROM));
+			echo $this->formRow($dafs->get(InteractionFieldset::TO));
+			?>
+			</div>
+			<div class="dialog-inside-fieldset-right">
+			<?php
+			if($dafs instanceof TelephoneInteractionFieldset) {
+				echo $this->formRow($dafs->get(TelephoneInteractionFieldset::TELEPHONE));
+			} elseif ($dafs instanceof FaxFieldset) {
+				echo $this->formRow($dafs->get(FaxFieldset::TELEPHONE));
+			} elseif ($dafs instanceof LetterFieldset) {
+				echo $this->formRow($dafs->get(LetterFieldset::ADDRESS));
+			}
+			echo $this->formRow($dafs->get(InteractionFieldset::DIRECTION));
+			?>
+			</div>
+			<div class="clearfix"></div>
+			<?php echo $this->formRow($dafs->get(InteractionFieldset::SUBJECT)); ?>
+		</fieldset>
+		<?php echo $this->formElement($dafs->get(InteractionFieldset::DESCRIPTION)); ?>
+		<fieldset>
+			<legend>Schedule and Status</legend>
+			<div class="dialog-inside-fieldset-left mtt">
+			<?php
+			echo $this->formRow($dafs->get(InteractionFieldset::OWNER));
+			echo $this->formRow($dafs->get(InteractionFieldset::SCHEDULEDEND));
+			?>
+			</div>
+			<div class="dialog-inside-fieldset-right mtt">
+			<?php
+			if($dafs instanceof TelephoneInteractionFieldset) {
+				echo $this->formRow($dafs->get(TelephoneInteractionFieldset::STATUS));
+			} elseif ($dafs instanceof FaxFieldset) {
+				echo $this->formRow($dafs->get(FaxFieldset::STATUS));
+			} elseif ($dafs instanceof LetterFieldset) {
+				echo $this->formRow($dafs->get(LetterFieldset::STATUS));
+			} else {
+				echo $this->formRow($dafs->get(InteractionFieldset::STATUS));
+			}
+			echo $this->formRow($dafs->get(InteractionFieldset::PRIORITY));
+			?>
+			</div>
+		</fieldset>
+		<div class="clearfix"></div>
+		
+		<?php elseif ($dafs instanceof AppointmentFieldset) : ?>
+		
+		<fieldset>
+			<legend>General</legend>
+			<?php
+			echo $this->formRow($dafs->get(AppointmentFieldset::SUBJECT));
+			echo $this->formRow($dafs->get(AppointmentFieldset::LOCATION));
+			?>
+		</fieldset>
+		<fieldset>
+			<legend>Status</legend>
+			<div class="dialog-inside-fieldset-left">
+				<?php
+				echo $this->formRow($dafs->get(AppointmentFieldset::SCHEDULEDSTART));
+				echo $this->formRow($dafs->get(AppointmentFieldset::SCHEDULEDEND));
+				?>
+			</div>
+			<div class="dialog-inside-fieldset-right">
+				<?php
+				echo $this->formRow($dafs->get(AppointmentFieldset::STATUS));
+				echo $this->formRow($dafs->get(AppointmentFieldset::PRIORITY));
+				?>
+			</div>
+		</fieldset>
+		<div class="clearfix"></div>
+		<?php echo $this->formElement($dafs->get(AppointmentFieldset::DESCRIPTION)); ?>
+		
+		<?php endif; ?>
+	
+		<div class="button-container">
+			<?php echo $this->formRow($df->get(ActivityForm::SUBMITCLOSE)); ?>
+			<a id="closeDistributeActivityButton" class="button" href="#" title="Cancel">Cancel</a>
+		</div>
+		<div class="clearfix"></div>
+	<?php endif; ?>
+	<?php echo $this->form()->closeTag(); ?>
+</div>

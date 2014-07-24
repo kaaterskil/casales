@@ -1,0 +1,99 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: memberQuery.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Form\AccountFieldset;
+use Application\Form\AccountForm;
+use Application\Form\ContactFieldset;
+use Application\Form\ContactForm;
+use Application\Form\LeadFieldset;
+use Application\Form\LeadForm;
+use Application\Model\MemberType;
+use Zend\Form\Fieldset;
+use Zend\Form\Form;
+
+$memberType = $this->memberType;
+$queryForm = $this->queryForm;
+$queryForm->setAttributes(array(
+	'action' => $this->url('marketingList', array('action' => 'memberIndex', 'id' => $this->id, 'type' => 'Query')),
+	'method' => 'post',
+	'name' => 'marketing-list-query'
+));
+if($queryForm instanceof AccountForm) {
+	$queryForm->get( AccountForm::SUBMIT )->setValue( 'Find' );
+	$fs = $queryForm->get( AccountFieldset::FIELDSETNAME );
+	
+} elseif($queryForm instanceof ContactForm) {
+	$queryForm->get( ContactForm::SUBMIT )->setValue( 'Find' );
+	$fs = $queryForm->get( ContactFieldset::FIELDSETNAME );
+	
+} elseif($queryForm instanceof LeadForm) {
+	$queryForm->get( LeadForm::SUBMIT )->setValue( 'Find' );
+	$fs = $queryForm->get( LeadFieldset::FIELDSETNAME );
+}
+$queryForm->prepare();
+
+$indexParams = array(
+	'id' => $this->id,
+	'memberType' => $this->memberType,
+	'recordSet' => $this->recordSet,
+);
+?>
+
+<h2><?php echo $memberType . 's'; ?></h2>
+<div class="">
+	<?php if($queryForm instanceof AccountForm) : ?>
+		<?php echo $this->form()->openTag($queryForm); ?>
+		<?php echo $this->formRow($fs->get(AccountFieldset::NAME)); ?>
+		<?php echo $this->formRow($fs->get(AccountFieldset::ACCOUNTGROUP)); ?>
+		<?php echo $this->formRow($queryForm->get(AccountForm::SUBMIT)); ?>
+		<?php echo $this->form()->closeTag(); ?>
+		
+	<?php elseif ($queryForm instanceof ContactForm) : ?>
+		<?php echo $this->form()->openTag($queryForm); ?>
+		<div class="inner-grid-6 alpha">
+		<?php echo $this->formRow($fs->get(ContactFieldset::DISPLAYNAME)); ?>
+		<?php echo $this->formRow($fs->get(ContactFieldset::JOBTITLE)); ?>
+		</div>
+		<div class="inner-grid-6 omega">
+		<?php echo $this->formRow($fs->get(ContactFieldset::ISPRIMARY)); ?>
+		<?php echo $this->formRow($fs->get(ContactFieldset::EMAIL1)); ?>
+		</div>
+		<div class="clearfix"></div>
+		<?php echo $this->formRow($queryForm->get(ContactForm::SUBMIT)); ?>
+		<?php echo $this->form()->closeTag(); ?>
+		
+	<?php elseif ($queryForm instanceof LeadForm) :  ?>
+		<?php echo $this->form()->openTag($queryForm); ?>
+		<div class="inner-grid-6 alpha">
+		<?php echo $this->formRow($fs->get(LeadFieldset::FULLNAME)); ?>
+		<?php echo $this->formRow($fs->get(LeadFieldset::COMPANYNAME)); ?>
+		</div>
+		<div class="inner-grid-6 omega">
+		<?php echo $this->formRow($fs->get(LeadFieldset::LEADSOURCE)); ?>
+		<?php echo $this->formRow($fs->get(LeadFieldset::EMAIL1)); ?>
+		</div>
+		<div class="clearfix"></div>
+		<?php echo $this->formRow($queryForm->get(LeadForm::SUBMIT)); ?>
+		<?php echo $this->form()->closeTag(); ?>
+	<?php endif; ?>
+</div>
+<div class="">
+	<?php echo $this->partial('application/marketingList/memberQueryIndex.phtml', $indexParams); ?>
+</div>

@@ -1,0 +1,109 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: campaignActivityIndex.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Model\CampaignActivity;
+
+/* @var $oca CampaignActivity */
+/* @var $cca CampaignActivity */
+?>
+<h2>Open Campaign Activities</h2>
+<div class="tabbed-table-container">
+	<table>
+		<thead class="fixed-thead">
+			<tr>
+				<th width="300" class="first">Subject</th>
+				<th width="120">Type</th>
+				<th width="80">State</th>
+				<th width="80">Priority</th>
+				<th width="110">Scheduled Start</th>
+				<th width="223">Due Date</th>
+			</tr>
+		</thead>
+		<tbody class="scrollable-tbody">
+			<?php if(count($this->openCampaignActivities)) : ?>
+			<?php foreach ($this->openCampaignActivities as $oca) : ?>
+			<?php
+			$link = $this->url( 'activity', array(
+				'action' => 'edit',
+				'id' => $oca->getId(),
+				'type' => $oca->getDiscriminator(),
+				'entityId' => $this->entityId,
+				'entityRoute' => $this->entityRoute
+			) );
+			?>
+			<tr>
+				<td width="300" class="first"><a href="<?php echo $link; ?>"><?php echo $oca->getSubject(); ?></a></td>
+				<td width="120"><?php echo $oca->getType(); ?></td>
+				<td width="80"><?php echo $oca->getStatus(); ?></td>
+				<td width="80"><?php echo $oca->getPriority(); ?></td>
+				<td width="110"><?php echo $oca->getFormattedScheduledStart(); ?></td>
+				<td width="207"><?php echo $oca->getFormattedScheduledEnd(); ?></td>
+			</tr>
+			<?php endforeach; ?>
+			<?php else : ?>
+			<tr>
+				<td colspan="6" class="tabbed-no-records">No records found.</td>
+			</tr>
+			<?php endif; ?>
+		</tbody>
+	</table>
+</div>
+<h2>Closed Campaign Activities</h2>
+<div class="tabbed-table-container">
+	<table>
+		<thead class="fixed-thead">
+			<tr>
+				<th width="300" class="first">Subject</th>
+				<th width="120">Type</th>
+				<th width="80">Status</th>
+				<th width="80">Priority</th>
+				<th width="110">Actual Start</th>
+				<th width="223">Actual End</th>
+			</tr>
+		</thead>
+		<tbody class="scrollable-tbody">
+			<?php if (count($this->closedCampaignActivities)) : ?>
+			<?php foreach ($this->closedCampaignActivities as $cca) : ?>
+			<?php
+			$link = $this->url( 'activity', array(
+				'action' => 'edit',
+				'id' => $cca->getId(),
+				'type' => $cca->getDiscriminator(),
+				'entityId' => $this->entityId,
+				'entityRoute' => $this->entityRoute
+			) );
+			?>
+			<tr>
+				<td width="300" class="first"><a href="<?php echo $link; ?>"><?php echo $cca->getSubject(); ?></a></td>
+				<td width="120"><?php echo $cca->getType(); ?></td>
+				<td width="80"><?php echo $cca->getStatus(); ?></td>
+				<td width="80"><?php echo $cca->getPriority(); ?></td>
+				<td width="110"><?php echo $cca->getFormattedActualStart(); ?></td>
+				<td width="207"><?php echo $cca->getFormattedActualEnd(); ?></td>
+			</tr>
+			<?php endforeach; ?>
+			<?php else : ?>
+			<tr>
+				<td colspan="6" class="tabbed-no-records">No records found.</td>
+			</tr>
+			<?php endif;?>
+		</tbody>
+	</table>
+</div>

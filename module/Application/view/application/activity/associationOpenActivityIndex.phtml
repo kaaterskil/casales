@@ -1,0 +1,84 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: associationOpenActivityIndex.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Model\AbstractActivity;
+use Application\Model\Schedulable;
+use Application\Model\StatefulActivity;
+
+/* @var $aa AbstractActivity */
+/* @var $sta StatefulActivity */
+/* @var $sch Schedulable */
+?>
+<h2>Open Activities</h2>
+<div class="tabbed-table-container-7">
+	<table>
+		<thead class="fixed-thead">
+			<tr>
+				<th width="300" class="first">Subject</th>
+				<th width="120">Type</th>
+				<th width="80">Status</th>
+				<th width="180">Regarding</th>
+				<th width="100">Priority</th>
+				<th width="133">Start Date</th>
+			</tr>
+		</thead>
+		<tbody class="scrollable-tbody">
+			<?php if(count($this->openActivities)) : ?>
+			<?php foreach ($this->openActivities as $aa) : ?>
+			<?php
+			$state = '';
+			$priority = '';
+			$scheduledEnd = '';
+			$scheduledStart = '';
+			if ($aa instanceof StatefulActivity) {
+				$sta = $aa;
+				$state = $sta->getStatus();
+				$priority = $sta->getPriority();
+			}
+			if ($aa instanceof Schedulable) {
+				$sch = $aa;
+				$scheduledEnd = $sch->getFormattedScheduledEnd();
+				$scheduledStart = $sch->getFormattedScheduledStart();
+			}
+			$link = $this->url( 'activity', array(
+				'action' => 'edit',
+				'id' => $aa->getId(),
+				'type' => $aa->getDiscriminator(),
+				'entityId' => $this->entityId,
+				'entityRoute' => $this->entityRoute
+			) );
+			?>
+			<tr>
+				<td width="300" class="first"><a href="<?php echo $link; ?>"><?php echo $aa->getSubject(); ?></a></td>
+				<td width="120"><?php echo $aa->getDiscriminatorTitle(); ?></td>
+				<td width="80"><?php echo $state; ?></td>
+				<td width="180"><?php echo $aa->getRegardingObjectName(true); ?></td>
+				<td width="100"><?php echo $priority; ?></td>
+				<td width="117"><?php echo $scheduledStart; ?></td>
+			</tr>
+			<?php endforeach; ?>
+			<?php else : ?>
+			<tr>
+				<td colspan="6" class="tabbed-no-records">No records found.</td>
+			</tr>
+			<?php endif; ?>
+		</tbody>
+	</table>
+</div>

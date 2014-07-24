@@ -1,0 +1,82 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: index.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Form\ActivityTypeForm;
+use Application\Model\ScheduledActivity;
+use Application\Model\ActivityType;
+use Application\Model\AbstractAppointment;
+use Application\Model\TrackedActivity;
+
+/* @var $form ActivityTypeForm */
+/* @var $obj ScheduledActivity */
+/* @var $tracked TrackedActivity */
+
+// Set page title
+$this->headTitle()->append( $this->pageTitle );
+$this->headTitle()->append( 'Casales' );
+?>
+<div class="grid_12">
+	<div class="entity-type">Activity</div>
+	<h1 class="page-title">
+		<?php echo $this->pageTitle; ?>
+	</h1>
+	<?php echo $this->navigation( $this->navigation )->menu()->renderMenu( null, array('ulClass' => 'ribbon') ); ?>
+	<div class="table-container">
+		<table>
+			<thead class="fixed-thead">
+				<tr>
+					<th width="70" align="center"></th>
+					<th width="70">Type</th>
+					<th width="330">Subject</th>
+					<th width="180">Regarding</th>
+					<th width="70">Priority</th>
+					<th width="100">Start Date</th>
+					<th width="118">Due Date</th>
+				</tr>
+			</thead>
+			<tbody class="scrollable-tbody">
+				<?php if(count($this->activities)) : ?>
+				<?php foreach ($this->activities as $obj) : ?>
+				<tr>
+					<td width="70" align="center"><a
+						href="<?php echo $this->url('activity', array('action' => 'edit', 'id' => $obj->getId(), 'type' => $obj->getDiscriminator())); ?>">Edit</a>
+						<a
+						href="<?php echo $this->url('activity', array('action' => 'delete', 'id' => $obj->getId(), 'type' => $obj->getDiscriminator())); ?>">Delete</a></td>
+					<td width="70"><?php echo $obj->getDiscriminatorTitle(); ?></td>
+					<td width="330"><?php echo $obj->getSubject(); ?></td>
+					<td width="180"><?php echo $obj->getRegardingObjectName(true); ?></td>
+					<td width="70"><?php echo $obj->getPriority(); ?></td>
+					<td width="100"><span class="bold"><?php echo $obj->getFormattedScheduledStart(); ?></span></td>
+					<td width="102"><?php echo $obj->getFormattedScheduledEnd(); ?></td>
+				</tr>
+				<?php endforeach; ?>
+				<?php else : ?>
+				<tr>
+					<td colspan="8" class="no-records">No records found.</td>
+				</tr>
+				<?php endif; ?>
+		</tbody>
+		</table>
+	</div>
+</div>
+<div class="clearfix"></div>
+<div class="grid_12">
+	<div class="bottom-status-bar"><?php echo $this->statusMessage; ?></div>
+</div>

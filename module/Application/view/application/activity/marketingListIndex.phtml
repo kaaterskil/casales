@@ -1,0 +1,74 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: marketingListIndex.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Model\MarketingList;
+
+/* @var $list MarketingList */
+
+$rowCount = 0;
+?>
+<h2>Marketing Lists</h2>
+<form name="campaignActivity-query-index-form"
+	action="<?php echo $this->url('activity', array(
+			'action' => 'marketingListIndex',
+			'id' => $this->id,
+			'type' => 'Remove',
+			'entityId' => $this->entityId,
+			'entityRoute' => $this->entityRoute
+	)); ?>"
+	method="post">
+	<div class="tabbed-table-container-3">
+		<table>
+			<thead class="fixed-thead">
+				<tr>
+					<th width="50" align="center">Select</th>
+					<th width="300">Name</th>
+					<th width="150">Type</th>
+					<th width="120">Last Used</th>
+					<th width="296">Purpose</th>
+				</tr>
+			</thead>
+			<tbody class="scrollable-tbody">
+				<?php if(count($this->marketingLists)) : ?>
+				<?php foreach ($this->marketingLists as $list) : ?>
+				<tr>
+					<td width="50" align="center"><input type="checkbox" id="checkbox_row_<?php echo ++$rowCount; ?>"
+						name="selected_fld[]" value="<?php echo $list->getId(); ?>"></td>
+					<td width="300"><?php echo $list->getName(); ?></td>
+					<td width="150"><?php echo $list->getMemberType(); ?></td>
+					<td width="120"><?php echo $list->getFormattedLastUsedDate(); ?></td>
+					<td width="260"><?php echo $list->getPurpose(); ?></td>
+				</tr>
+				<?php endforeach; ?>
+				<?php else : ?>
+				<tr>
+					<td colspan="5" class="tabbed-no-records">No records found.</td>
+				</tr>
+				<?php endif; ?>
+			</tbody>
+		</table>
+	</div>
+	<div class="mtm">
+		<div class="lfloat mrm mtt">
+			<a id="select-all-remove" class="button" href="#">Select All</a>
+		</div>
+		<input type="submit" class="button" value="Remove Selected" name="removeSelected">
+	</div>
+</form>

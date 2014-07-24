@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: closeActivityForm.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Form\CloseActivityForm;
+
+/* @var $caf CloseActivityForm */
+
+$caf = $this->caf;
+$caf->setAttributes( array(
+	'action' => $this->url( 'activity', array(
+		'action' => 'close',
+		'id' => $this->id,
+		'type' => $this->type,
+		'entityId' => $this->entityId,
+		'entityRoute' => $this->entityRoute
+	) ),
+	'method' => 'post',
+) );
+$caf->prepare();
+?>
+<div class="close-activity-dialog">
+	<h2 class="dialog-title">Close <?php echo $this->type; ?></h2>
+	<div class="dialog-title">Select the status of the closing <?php echo $this->type; ?></div>
+	<?php
+	echo $this->form()->openTag($caf);
+	echo $this->formRow($caf->get(CloseActivityForm::STATUS));
+	echo $this->formRow($caf->get(CloseActivityForm::ACTUALEND));
+	?>
+	<div class="button-container">
+		<?php echo $this->formRow($caf->get(CloseActivityForm::SUBMIT)); ?>
+		<a id="closeCloseActivityButton" class="button lfloat mbm" href="#" title="Cancel">Cancel</a>
+	</div>
+	<?php echo $this->form()->closeTag(); ?>
+</div>

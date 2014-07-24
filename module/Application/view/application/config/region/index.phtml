@@ -1,0 +1,65 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: index.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Model\Region;
+
+/* @var $obj Region */
+
+// Set page title
+$this->headTitle()->append( $this->pageTitle );
+$this->headTitle()->append( 'Casales' );
+
+$recordSet = $this->recordSet;
+?>
+<div class="grid_12">
+	<h1 class="page-title"><?php echo $this->pageTitle; ?></h1>
+	<p>
+		<a accesskey="n" href="<?php echo $this->url('config', array('slug' => $slug, 'action' => 'create')); ?>">Create New</a>
+	</p>
+	<table>
+		<thead>
+			<tr>
+				<td width="80" align="center"></td>
+				<td width="40" align="center">Id</td>
+				<td width="200" align="left">Name</td>
+				<td width="90" align="left">Abbreviation</td>
+			</tr>
+		</thead>
+		<tbody>
+			<?php if(count($recordSet)) :?>
+			<?php foreach ($recordSet as $obj) :?>
+			<tr>
+				<td align="center"><a
+					href="<?php echo $this->url('config', array('slug' => $slug, 'action' => 'edit', 'id' => $obj->getId())); ?>">Edit</a>
+					<a href="<?php echo $this->url('config', array('slug' => $slug, 'action' => 'delete', 'id' => $obj->getId())); ?>">Delete</a>
+				</td>
+				<td align="center"><?php echo $obj->getId(); ?></td>
+				<td><?php echo $obj->getName(); ?></td>
+				<td><?php echo $obj->getAbbreviation(); ?></td>
+			</tr>
+			<?php endforeach; ?>
+			<?php else : ?>
+			<tr>
+				<td colspan="6">No records found.</td>
+			</tr>
+			<?php endif; ?>
+		</tbody>
+	</table>
+</div>

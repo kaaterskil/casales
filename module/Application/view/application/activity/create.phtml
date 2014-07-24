@@ -1,0 +1,282 @@
+<?php
+
+/**
+ * Casales Library
+ * PHP version 5.4
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ * KAATERSKIL MANAGEMENT, LLC BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Casales
+ * @package Application
+ * @copyright Copyright (c) 2009-2013 Kaaterskil Management, LLC
+ * @version SVN $Id: create.phtml 13 2013-08-05 22:53:55Z  $
+ */
+use Application\Form\ActivityForm;
+use Application\Form\BaseActivityFieldset;
+use Application\Form\CampaignActivityFieldset;
+use Application\Form\AppointmentFieldset;
+use Application\Form\TaskFieldset;
+use Application\Form\NoteFieldset;
+use Application\Form\InteractionFieldset;
+use Application\Form\FaxFieldset;
+use Application\Form\LetterFieldset;
+use Application\Form\TelephoneInteractionFieldset;
+use Application\Form\VisitFieldset;
+use Application\Model\LetterInteraction;
+use Application\Form\EmailFieldset;
+use Application\Model\TelephoneInteraction;
+
+/* @var $form ActivityForm */
+/* @var $afs BaseActivityFieldset */
+
+// Set page title
+$this->headTitle()->append($this->pageTitle);
+$this->headTitle()->append('Casales');
+
+$form = $this->form;
+
+// Set the form attributes
+$form->setAttributes(array(
+	'action' => $this->url('activity', array(
+		'action' => 'create',
+		'id' => $this->id,
+		'type' => $this->type,
+		'entityId' => $this->entityId,
+		'entityRoute' => $this->entityRoute
+	)),
+	'method' => 'post',
+	'name' => 'activity-create',
+));
+$form->prepare();
+
+// Get the fieldset
+$afs = $form->get(BaseActivityFieldset::FIELDSETNAME);
+
+// Rest form element attributes
+if($afs instanceof AppointmentFieldset) {
+	$afs->get(AppointmentFieldset::DESCRIPTION)->setAttributes(array('cols'=> 175, 'rows' => 22));
+} elseif ($afs instanceof TelephoneInteractionFieldset) {
+	$afs->get(TelephoneInteractionFieldset::DESCRIPTION)->setAttributes(array('cols'=> 175, 'rows' => 18));
+} elseif ($afs instanceof FaxFieldset) {
+	$afs->get(FaxFieldset::DESCRIPTION)->setAttributes(array('cols'=> 175, 'rows' => 20));
+} elseif ($afs instanceof LetterFieldset) {
+	$afs->get(LetterFieldset::DESCRIPTION)->setAttributes(array('id' => 'letter', 'cols'=> 175, 'rows' => 15));
+} elseif ($afs instanceof VisitFieldset) {
+	$afs->get(VisitFieldset::DESCRIPTION)->setAttributes(array('cols'=> 175, 'rows' => 22));
+} elseif ($afs instanceof NoteFieldset) {
+	$afs->get(NoteFieldset::DESCRIPTION)->setAttributes(array('cols'=> 175, 'rows' => 28));
+} elseif ($afs instanceof TaskFieldset) {
+	$afs->get(NoteFieldset::DESCRIPTION)->setAttributes(array('cols'=> 175, 'rows' => 23));
+}
+?>
+<script type="text/javascript">
+tinymce.init({
+    selector : "textarea#letter",
+    menubar : false
+ });
+</script>
+<div class="grid_12">
+	<div class="entity-type">Activity</div>
+	<h1 class="page-title">
+		<?php echo $this->pageTitle; ?>
+	</h1>
+
+	<div class="tab-content">
+		<?php
+		echo $this->form()->openTag($form);
+		echo $this->formRow($afs->get(BaseActivityFieldset::DISCRIMINATOR));
+		echo $this->formRow($afs->get(BaseActivityFieldset::ACCOUNT));
+		echo $this->formRow($afs->get(BaseActivityFieldset::CAMPAIGN));
+		echo $this->formRow($afs->get(BaseActivityFieldset::CONTACT));
+		echo $this->formRow($afs->get(BaseActivityFieldset::LEAD));
+		echo $this->formRow($afs->get(BaseActivityFieldset::OPPORTUNITY));
+		?>
+		
+		<?php if ($afs instanceof CampaignActivityFieldset) : ?>
+		
+		<fieldset>
+			<legend>General</legend>
+			<?php echo $this->formRow($afs->get(CampaignActivityFieldset::SUBJECT)); ?>
+			<div class="inside-fieldset-left">
+				<?php
+				echo $this->formRow($afs->get(CampaignActivityFieldset::CHANNEL));
+				echo $this->formRow($afs->get(CampaignActivityFieldset::OWNER));
+				?>
+			</div>
+			<div class="inside-fieldset-right">
+				<?php
+				echo $this->formRow($afs->get(CampaignActivityFieldset::STATUS));
+				echo $this->formRow($afs->get(CampaignActivityFieldset::TYPECODE));
+				?>
+			</div>
+		</fieldset>
+		<div class="clearfix"></div>
+		<fieldset>
+			<legend>Schedule</legend>
+			<div class="inside-fieldset-left">
+				<?php
+				echo $this->formRow($afs->get(CampaignActivityFieldset::SCHEDULEDSTART));
+				echo $this->formRow($afs->get(CampaignActivityFieldset::SCHEDULEDEND));
+				echo $this->formRow($afs->get(CampaignActivityFieldset::PRIORITY));
+				?>
+			</div>
+			<div class="inside-fieldset-right">
+				<?php
+				echo $this->formRow($afs->get(CampaignActivityFieldset::ACTUALSTART));
+				echo $this->formRow($afs->get(CampaignActivityFieldset::ACTUALEND));
+				?>
+			</div>
+		</fieldset>
+		<div class="clearfix"></div>
+		
+		<?php elseif ($afs instanceof InteractionFieldset) : ?>
+		
+		<fieldset>
+			<legend>General</legend>
+			<div class="inside-fieldset-left">
+				<?php
+				if(!$afs instanceof VisitFieldset) {
+					echo $this->formRow($afs->get(InteractionFieldset::FROM));
+					echo $this->formRow($afs->get(InteractionFieldset::TO));
+				} else {
+					echo $this->formRow($afs->get(VisitFieldset::DIRECTION));
+				}
+				?>
+			</div>
+			<div class="inside-fieldset-right">
+				<?php
+				if(!$afs instanceof VisitFieldset) {
+					if($afs instanceof TelephoneInteractionFieldset) {
+						echo $this->formRow($afs->get(TelephoneInteractionFieldset::TELEPHONE));
+						echo $this->formRow($afs->get(TelephoneInteractionFieldset::LEFTVOICEMAIL));
+					} elseif ($afs instanceof FaxFieldset) {
+						echo $this->formRow($afs->get(FaxFieldset::TELEPHONE));
+					} elseif ($afs instanceof LetterFieldset) {
+						echo $this->formRow($afs->get(LetterFieldset::ADDRESS));
+					}
+					echo $this->formRow($afs->get(InteractionFieldset::DIRECTION));
+				}
+				?>
+			</div>
+			<div class="clearfix"></div>
+			<?php echo $this->formRow($afs->get(InteractionFieldset::SUBJECT)); ?>
+		</fieldset>
+		<?php echo $this->formElement($afs->get(InteractionFieldset::DESCRIPTION)); ?>
+		<fieldset class="mtt">
+			<legend>Schedule and Status</legend>
+			<div class="inside-fieldset-left">
+			<?php
+			echo $this->formRow($afs->get(InteractionFieldset::OWNER));
+			if(!$afs instanceof VisitFieldset) {
+				echo $this->formRow($afs->get(InteractionFieldset::SCHEDULEDEND));
+			} else {
+				echo $this->formRow($afs->get(VisitFieldset::ACTUALEND));
+			}
+			?>
+			</div>
+			<div class="inside-fieldset-right">
+			<?php
+			if($afs instanceof TelephoneInteractionFieldset) {
+				echo $this->formRow($afs->get(TelephoneInteractionFieldset::STATUS));
+			} elseif ($afs instanceof FaxFieldset) {
+				echo $this->formRow($afs->get(FaxFieldset::STATUS));
+			} elseif ($afs instanceof LetterFieldset) {
+				echo $this->formRow($afs->get(LetterFieldset::STATUS));
+			} else {
+				echo $this->formRow($afs->get(InteractionFieldset::STATUS));
+			}
+			echo $this->formRow($afs->get(InteractionFieldset::PRIORITY));
+			?>
+			</div>
+		</fieldset>
+		<div class="clearfix"></div>
+		
+		<?php elseif ($afs instanceof AppointmentFieldset) :  ?>
+		
+		<fieldset>
+			<legend>General</legend>
+			<?php
+			echo $this->formRow($afs->get(AppointmentFieldset::SUBJECT));
+			echo $this->formRow($afs->get(AppointmentFieldset::LOCATION));
+			?>
+		</fieldset>
+		<fieldset>
+			<legend>Status</legend>
+			<div class="inside-fieldset-left">
+				<?php
+				echo $this->formRow($afs->get(AppointmentFieldset::SCHEDULEDSTART));
+				echo $this->formRow($afs->get(AppointmentFieldset::SCHEDULEDEND));
+				?>
+			</div>
+			<div class="inside-fieldset-right">
+				<?php
+				echo $this->formRow($afs->get(AppointmentFieldset::OWNER));
+				echo $this->formRow($afs->get(AppointmentFieldset::STATUS));
+				echo $this->formRow($afs->get(AppointmentFieldset::PRIORITY));
+				?>
+			</div>
+		</fieldset>
+		<div class="clearfix"></div>
+		<?php echo $this->formElement($afs->get(AppointmentFieldset::DESCRIPTION)); ?>
+		
+		<?php elseif ($afs instanceof NoteFieldset) : ?>
+		
+		<fieldset>
+			<legend>General</legend>
+			<?php
+			echo $this->formRow($afs->get(NoteFieldset::SUBJECT));
+			echo $this->formRow($afs->get(NoteFieldset::PRIORITY));
+			?>
+		</fieldset>
+		<div class="clearfix"></div>
+		<?php echo $this->formElement($afs->get(NoteFieldset::DESCRIPTION)); ?>
+		
+		<?php elseif ($afs instanceof TaskFieldset) : ?>
+		
+		<fieldset>
+			<legend>General</legend>
+			<?php
+			echo $this->formRow($afs->get(TaskFieldset::SUBJECT));
+			?>
+		</fieldset>
+		<div class="clearfix"></div>
+		<?php echo $this->formElement($afs->get(TaskFieldset::DESCRIPTION)); ?>
+		<fieldset>
+			<legend>Status</legend>
+			<div class="inside-fieldset-left">
+				<?php
+				echo $this->formRow($afs->get(TaskFieldset::OWNER));
+				echo $this->formRow($afs->get(TaskFieldset::SCHEDULEDEND));
+				?>
+			</div>
+			<div class="inside-fieldset-right">
+				<?php
+				// echo $this->formRow($afs->get(TaskFieldset::PERCENTCOMPLETE));
+				echo $this->formRow($afs->get(TaskFieldset::STATUS));
+				echo $this->formRow($afs->get(TaskFieldset::PRIORITY));
+				?>
+			</div>
+		</fieldset>
+		<div class="clearfix"></div>
+		
+		<?php endif; ?>
+	
+		<div class="button-container">
+			<?php echo $this->formRow($form->get(ActivityForm::SUBMIT)); ?>
+			<?php echo $this->formRow($form->get(ActivityForm::SUBMITCLOSE)); ?>
+		</div>
+		<div class="clearfix"></div>
+	<?php echo $this->form()->closeTag(); ?>
+	</div>
+</div>
+<div class="clearfix"></div>
+<div class="grid_12">
+	<div class="bottom-status-bar"><?php echo $this->statusMessage; ?></div>
+</div>
